@@ -4,5 +4,6 @@ GymScheduleIAM:
     - dynamodb:PutItem
     - dynamodb:Scan
     - dynamodb:GetItem
+    - dynamodb:UpdateItem
   Resource:
     - ${self:custom.GymScheduleTable.arn}

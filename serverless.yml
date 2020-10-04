@@ -42,6 +42,13 @@ functions:
           method: GET
           path: /training/{id}
 
+  bookTraining:
+    handler: src/handlers/bookTraining.handler
+    events:
+      - http:
+          method: PATCH
+          path: /training/{id}/book
+
 custom:
   GymScheduleTable:
     name: !Ref GymScheduleTable

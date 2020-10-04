@@ -1,15 +1,12 @@
 import { v4 as uuid } from 'uuid';
 import AWS from 'aws-sdk';
-import middy from '@middy/core';
-import httpJsonBodyParser from '@middy/http-json-body-parser';
-import httpEventNormalizer from '@middy/http-event-normalizer';
-import httpErrorHandler from '@middy/http-error-handler';
+import commonMiddleware from '../lib/commonMiddleware';
 import createError from 'http-errors';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 async function addTraining(event, context) {
-    const { title } = JSON.parse(event.body);
+    const { title, numberOfPlaces } = JSON.parse(event.body);
     const now = new Date();
 
     const training = {
@@ -17,6 +14,9 @@ async function addTraining(event, context) {
         title,
         status: 'PLACES_AVAILABLE',
         createdAt: now.toISOString(),
+        placesAvailable: {
+            numberOfPlaces: numberOfPlaces,
+        },
     };
 
     try {
@@ -37,7 +37,4 @@ async function addTraining(event, context) {
     };
 }
 
-export const handler = middy(addTraining)
-    .use(httpJsonBodyParser())
-    .use(httpEventNormalizer())
-    .use(httpErrorHandler());
+export const handler = commonMiddleware(addTraining);
