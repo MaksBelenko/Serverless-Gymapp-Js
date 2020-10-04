@@ -1,0 +1,6 @@
+GymScheduleIAM:
+  Effect: Allow
+  Action:
+    - dynamodb:PutItem
+  Resource:
+    - ${self:custom.GymScheduleTable.arn}

@@ -15,7 +15,7 @@ async function addTraining(event, context) {
     };
 
     await dynamodb.put({
-        TableName: 'GymScheduleTable',
+        TableName: process.env.GYMSCHEDULE_TABLE_NAME,
         Item: training,
     }).promise();
 

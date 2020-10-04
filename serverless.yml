@@ -11,27 +11,14 @@ provider:
   memorySize: 256
   stage: ${opt:stage, 'dev'}
   region: eu-west-1
+  environment:
+    GYMSCHEDULE_TABLE_NAME: ${self:custom.GymScheduleTable.name}
   iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:PutItem
-      Resource:
-        - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/GymScheduleTable
-
+    - ${file(iam/GymScheduleIAM.yml):GymScheduleIAM}
 
 resources:
   Resources:
-    GymScheduleTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: GymScheduleTable
-        BillingMode: PAY_PER_REQUEST
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
+    GymScheduleTable: ${file(resources/GymScheduleTable.yml):GymScheduleTable}
   
 functions:
   addTraining:
@@ -40,3 +27,8 @@ functions:
       - http:
           method: POST
           path: /training
+
+custom:
+  GymScheduleTable:
+    name: !Ref GymScheduleTable
+    arn: !GetAtt GymScheduleTable.Arn
