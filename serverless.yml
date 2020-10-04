@@ -28,6 +28,20 @@ functions:
           method: POST
           path: /training
 
+  getTrainings:
+    handler: src/handlers/getTrainings.handler
+    events:
+      - http:
+          method: GET
+          path: /training
+
+  getTrainingById:
+    handler: src/handlers/getTrainingById.handler
+    events:
+      - http:
+          method: GET
+          path: /training/{id}
+
 custom:
   GymScheduleTable:
     name: !Ref GymScheduleTable

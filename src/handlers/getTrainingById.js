@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import AWS from 'aws-sdk';
 import middy from '@middy/core';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
@@ -8,36 +7,35 @@ import createError from 'http-errors';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-async function addTraining(event, context) {
-    const { title } = JSON.parse(event.body);
-    const now = new Date();
-
-    const training = {
-        id: uuid(),
-        title,
-        status: 'PLACES_AVAILABLE',
-        createdAt: now.toISOString(),
-    };
+async function getTrainingById(event, context) {
+    let training;
+    const { id } = event.pathParameters;
 
     try {
-        await dynamodb
-            .put({
+        const result = await dynamodb
+            .get({
                 TableName: process.env.GYMSCHEDULE_TABLE_NAME,
-                Item: training,
+                Key: { id },
             })
             .promise();
+
+        training = result.Item;
     } catch (error) {
         console.log(error);
         throw new createError.InternalServerError(error);
     }
 
+    if (!training) {
+        throw new createError.NotFound(`Training with ID "${id}" not found!`);
+    }
+
     return {
-        statusCode: 201,
+        statusCode: 200,
         body: JSON.stringify(training),
     };
 }
 
-export const handler = middy(addTraining)
+export const handler = middy(getTrainingById)
     .use(httpJsonBodyParser())
     .use(httpEventNormalizer())
     .use(httpErrorHandler());
