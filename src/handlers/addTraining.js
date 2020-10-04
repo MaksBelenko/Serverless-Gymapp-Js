@@ -1,19 +1,28 @@
+import { v4 as uuid } from 'uuid';
+import AWS from 'aws-sdk';
+
+const dynamodb = new AWS.DynamoDB.DocumentClient();
+
 async function addTraining(event, context) {
-  const { title } = JSON.parse(event.body);
-  const now = new Date();
+    const { title } = JSON.parse(event.body);
+    const now = new Date();
 
-  const training = {
-    title,
-    status: 'OPEN',
-    createdAt: now.toISOString(),
-  };
+    const training = {
+        id: uuid(),
+        title,
+        status: 'PLACES_AVAILABLE',
+        createdAt: now.toISOString(),
+    };
 
-  return {
-    statusCode: 201,
-    body: JSON.stringify(training),
-  };
+    await dynamodb.put({
+        TableName: 'GymScheduleTable',
+        Item: training,
+    }).promise();
+
+    return {
+        statusCode: 201,
+        body: JSON.stringify(training),
+    };
 }
 
 export const handler = addTraining;
-
-

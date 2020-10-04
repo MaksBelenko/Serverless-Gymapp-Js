@@ -11,7 +11,27 @@ provider:
   memorySize: 256
   stage: ${opt:stage, 'dev'}
   region: eu-west-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+      Resource:
+        - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/GymScheduleTable
 
+
+resources:
+  Resources:
+    GymScheduleTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: GymScheduleTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
   
 functions:
   addTraining:
