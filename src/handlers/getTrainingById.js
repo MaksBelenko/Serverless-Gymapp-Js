@@ -4,9 +4,8 @@ import createError from 'http-errors';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-async function getTrainingById(event, context) {
+export async function getSingleAuction(id) {
     let training;
-    const { id } = event.pathParameters;
 
     try {
         const result = await dynamodb
@@ -25,6 +24,13 @@ async function getTrainingById(event, context) {
     if (!training) {
         throw new createError.NotFound(`Training with ID "${id}" not found!`);
     }
+
+    return training;
+}
+
+async function getTrainingById(event, context) {
+    const { id } = event.pathParameters;
+    const training = await getSingleAuction(id);
 
     return {
         statusCode: 200,

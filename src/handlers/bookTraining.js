@@ -1,12 +1,19 @@
 import AWS from 'aws-sdk';
 import commonMiddleware from '../lib/commonMiddleware';
 import createError from 'http-errors';
+import { getSingleAuction } from './getTrainingById';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 async function bookTraining(event, context) {
     const { id } = event.pathParameters;
     const { numberOfPlaces } = JSON.parse(event.body);
+
+    const training = await getSingleAuction(id);
+
+    if (numberOfPlaces <= training.numberOfPlaces) {
+        throw new createError.Forbidden(`Cannot unbook the training`);
+    }
 
     const params = {
         TableName: process.env.GYMSCHEDULE_TABLE_NAME,
